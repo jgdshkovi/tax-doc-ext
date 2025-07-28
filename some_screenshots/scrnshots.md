@@ -1,1 +1,1 @@
-Some Screenshots to cisualize the project build.
+Some Screenshots to visualize the project build.
