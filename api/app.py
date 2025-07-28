@@ -5,9 +5,11 @@ import os
 import tempfile
 import time
 import gc  # Add garbage collection import
+import json
 from flask import Flask, jsonify, request, send_file
 from flask_cors import CORS
 from google.cloud import documentai_v1 as documentai
+from google.oauth2 import service_account
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -19,12 +21,13 @@ app = Flask(__name__)
 CORS(app, origins=[
     # "https://app11-bw3qdffff-jagadeesh-ks-projects-b6d83340.vercel.app",
     # "https://app11-bw3qdffff-jagadeesh-ks-projects-b6d83340.vercel.app/",
-    "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app/",
-    "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app",
+    # "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app/",
+    # "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app",
+    "https://app5-ldlifea0e-jagadeesh-ks-projects-b6d83340.vercel.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://34.27.144.213:5000",
-    "*"  # Allow all origins for testing - remove in production
+    "*"  # Allow all origins for testing - remove in production 
 ])  # Enable CORS for specific origins
 
 # Configuration
@@ -46,8 +49,22 @@ def online_process(project_id: str, location: str, processor_id: str, file_conte
     """
     opts = {"api_endpoint": f"{location}-documentai.googleapis.com"}
     
+    # Handle Google Cloud authentication
+    credentials = None
+    if 'GOOGLE_APPLICATION_CREDENTIALS_JSON' in os.environ:
+        # Use service account from environment variable (for Render deployment)
+        credentials_json = json.loads(os.environ['GOOGLE_APPLICATION_CREDENTIALS_JSON'])
+        credentials = service_account.Credentials.from_service_account_info(credentials_json)
+    
     # Instantiates a client
-    documentai_client = documentai.DocumentProcessorServiceClient(client_options=opts)
+    if credentials:
+        documentai_client = documentai.DocumentProcessorServiceClient(
+            client_options=opts, 
+            credentials=credentials
+        )
+    else:
+        # Fall back to default credentials (for local development)
+        documentai_client = documentai.DocumentProcessorServiceClient(client_options=opts)
     
     # The full resource name of the processor
     resource_name = documentai_client.processor_path(project_id, location, processor_id)
@@ -233,13 +250,26 @@ def process_tax_documents():
                         continue
                     
                     # Step 4: Process with Document AI
-                    document = online_process(
-                        project_id=PROJECT_ID,
-                        location=LOCATION,
-                        processor_id=processor_id,
-                        file_content=file_content,
-                        mime_type=MIME_TYPE,
-                    )
+                    try:
+                        document = online_process(
+                            project_id=PROJECT_ID,
+                            location=LOCATION,
+                            processor_id=processor_id,
+                            file_content=file_content,
+                            mime_type=MIME_TYPE,
+                        )
+                    except Exception as auth_error:
+                        if "DefaultCredentialsError" in str(auth_error):
+                            results.append({
+                                "filename": file.filename,
+                                "status": "error",
+                                "error": "Google Cloud authentication not configured. Please set up service account credentials.",
+                                "identified_form": identified_form,
+                                "similarity_score": similarity_score
+                            })
+                            continue
+                        else:
+                            raise auth_error
                     
                     # Step 5: Extract structured data
                     form_data = {}
