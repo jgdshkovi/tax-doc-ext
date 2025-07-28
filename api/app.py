@@ -17,10 +17,14 @@ from tac_calc import calculate_form_1040_values
 
 app = Flask(__name__)
 CORS(app, origins=[
-    "https://app11-bw3qdffff-jagadeesh-ks-projects-b6d83340.vercel.app",
-    "https://app11-jagakovi-7476-jagadeesh-ks-projects-b6d83340.vercel.app",  # Previous URL (backup)
+    # "https://app11-bw3qdffff-jagadeesh-ks-projects-b6d83340.vercel.app",
+    # "https://app11-bw3qdffff-jagadeesh-ks-projects-b6d83340.vercel.app/",
+    "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app/",
+    "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app",
     "http://localhost:3000",
-    "http://127.0.0.1:3000"
+    "http://127.0.0.1:3000",
+    "http://34.27.144.213:5000",
+    "*"  # Allow all origins for testing - remove in production
 ])  # Enable CORS for specific origins
 
 # Configuration
@@ -434,4 +438,5 @@ def home():
     })
 
 if __name__ == '__main__':
-    app.run()  # Different port to avoid conflicts 
+    port = int(os.environ.get('PORT', 5000))  # Use Render's PORT or default to 5000
+    app.run(host='0.0.0.0', port=port, debug=False)  # Listen on all interfaces 
