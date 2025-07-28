@@ -22,7 +22,7 @@ CORS(app, origins=[
     # "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app/",
     # "https://app2-rgc3ps9ko-jagadeesh-ks-projects-b6d83340.vercel.app",
     # "https://app5-ldlifea0e-jagadeesh-ks-projects-b6d83340.vercel.app",
-    "https://tax-qwocslbfx-jagadeesh-ks-projects-b6d83340.vercel.app,
+    "https://tax-qwocslbfx-jagadeesh-ks-projects-b6d83340.vercel.app",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://34.27.144.213:5000",
