@@ -1,4 +1,4 @@
-# AI Tax Return Agent Prototype
+# AI Tax Return - Prototype
 
 An end-to-end prototype of an AI agent that automates personal tax return preparation by processing tax documents and generating completed Form 1040.
 
