@@ -208,11 +208,6 @@ This prototype demonstrates the viability of AI-powered tax preparation while hi
 
 are welcome.
 
-## 📄 Documentation
-
-- **[FINAL_REPORT.md](FINAL_REPORT.md)**: Comprehensive project analysis and technical details
-- **[Jaga ReadME.md](Jaga%20ReadME.md)**: Development notes and experimentation log
-- **API Documentation**: Available at http://localhost:5001/ when server is running
 
 ## 🎓 Key Learnings
 
